@@ -1,77 +1,89 @@
 -- ==============================================
--- WezTerm 設定ファイル
+-- wezterm 設定ファイル
 -- 場所: C:\Users\nakan\.config\wezterm\wezterm.lua
 -- ==============================================
 
--- WezTermの機能を読み込む（おまじないとして必ず書く）
 local wezterm = require("wezterm")
-
--- 設定オブジェクトを作成（おまじないとして必ず書く）
 local config = wezterm.config_builder()
 
 -- ==============================================
 -- フォント設定
 -- ==============================================
-
--- 使用するフォントを指定
--- Nerd Fontを使うことでNeovimのアイコンが正しく表示される
 config.font = wezterm.font("JetBrainsMono Nerd Font")
-
--- フォントサイズ（お好みで調整）
 config.font_size = 13.0
 
 -- ==============================================
 -- カラーテーマ
 -- ==============================================
-
--- ターミナル全体の配色テーマ
--- VSCodeのダークテーマに近い見た目になる
--- 他のテーマは https://wezfurlong.org/wezterm/colorschemes/ で確認できる
 config.color_scheme = "Kanagawa (Gogh)"
 
 -- ==============================================
 -- タブバー設定
 -- ==============================================
-
--- falseにするとシンプルなタブバーになる
--- trueだとブラウザのようなリッチなタブバーになる
+config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = false
 
--- タブバーをウィンドウ下部に表示（VSCodeっぽい配置）
-config.tab_bar_at_bottom = true
+-- 矢印型タブをformat-tab-titleイベントで実現
+-- tab_bar_styleはバージョンによって非対応のためこちらを使う
+local SOLID_LEFT_ARROW = wezterm.nerdfonts.pl_right_hard_divider
+local SOLID_RIGHT_ARROW = wezterm.nerdfonts.pl_left_hard_divider
+
+wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+  local title = tab.active_pane.title
+  if tab.is_active then
+    return {
+      { Background = { Color = "#1f1f28" } },
+      { Foreground = { Color = "#7e9cd8" } },
+      { Text = SOLID_LEFT_ARROW },
+      { Background = { Color = "#7e9cd8" } },
+      { Foreground = { Color = "#1f1f28" } },
+      { Text = " " .. title .. " " },
+      { Background = { Color = "#1f1f28" } },
+      { Foreground = { Color = "#7e9cd8" } },
+      { Text = SOLID_RIGHT_ARROW },
+    }
+  end
+  return {
+    { Background = { Color = "#1f1f28" } },
+    { Foreground = { Color = "#2a2a37" } },
+    { Text = SOLID_LEFT_ARROW },
+    { Background = { Color = "#2a2a37" } },
+    { Foreground = { Color = "#727169" } },
+    { Text = " " .. title .. " " },
+    { Background = { Color = "#1f1f28" } },
+    { Foreground = { Color = "#2a2a37" } },
+    { Text = SOLID_RIGHT_ARROW },
+  }
+end)
+
+config.colors = {
+  tab_bar = {
+    background = "#1f1f28",
+    new_tab = {
+      bg_color = "#1f1f28",
+      fg_color = "#727169",
+    },
+  },
+}
 
 -- ==============================================
 -- ウィンドウ設定
 -- ==============================================
-
--- ウィンドウの内側の余白（上下左右のpx）
 config.window_padding = {
-	left = 8,
-	right = 8,
-	top = 8,
-	bottom = 8,
+  left = 8,
+  right = 8,
+  top = 8,
+  bottom = 8,
 }
-
--- 起動時のウィンドウサイズ（列数 x 行数）
--- モニターサイズに合わせて調整する
 config.initial_cols = 140
 config.initial_rows = 35
 
 -- ==============================================
 -- 透明度設定
 -- ==============================================
-
--- ウィンドウの透明度（0.0=完全透明 〜 1.0=不透明）
--- 0.9〜0.95くらいがちょうどいい
--- config.window_background_opacity = 0.5
-
--- ぼかし効果
--- config.win32_system_backdrop = "Acrylic"
-
--- 透過ON/OFFをトグルするキーバインド
--- 透過は常に固定
 config.window_background_opacity = 0.5
-config.win32_system_backdrop = "Acrylic"  -- 初期状態はぼかしON
+config.win32_system_backdrop = "Acrylic"
 
 local is_blur = true
 
@@ -90,43 +102,36 @@ config.keys = {
   },
 }
 
-
 -- ==============================================
 -- タイトルバー設定
 -- ==============================================
-
--- タイトルバーを非表示にしてスッキリさせる
--- （ウィンドウの移動はAlt+ドラッグで可能になる）
 config.window_decorations = "RESIZE"
 
 -- ==============================================
 -- カーソル設定
 -- ==============================================
-
--- カーソルの形状
--- "SteadyBlock"  → 点滅なしブロック（デフォルト）
--- "BlinkingBlock" → 点滅ブロック
--- "SteadyBar"    → 点滅なし縦線（VSCodeのデフォルト）
--- "BlinkingBar"  → 点滅縦線
 config.default_cursor_style = "SteadyBar"
 
 -- ==============================================
 -- シェル設定
 -- ==============================================
+wezterm.on("gui-startup", function()
+  local tab, pane, window = wezterm.mux.spawn_window({
+    args = { "wsl.exe", "--distribution", "Ubuntu", "--cd", "~" },
+  })
+  tab:set_title("WSL")
 
--- 起動時に使うシェルを指定
-config.default_prog = { "wsl.exe", "--distribution", "Ubuntu", "--cd", "~" }
+  window:spawn_tab({
+    args = { "powershell.exe" },
+  })
+
+  tab:activate()
+end)
+
 -- ==============================================
 -- スクロール設定
 -- ==============================================
-
--- スクロールバックで遡れる行数
 config.scrollback_lines = 10000
-
--- 自動で設定を反映する
 config.automatically_reload_config = true
 
--- ==============================================
--- 最後に必ずreturnする（おまじないとして必ず書く）
--- ==============================================
 return config
