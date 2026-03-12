@@ -9,7 +9,10 @@ local config = wezterm.config_builder()
 -- ==============================================
 -- フォント設定
 -- ==============================================
-config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.font = wezterm.font_with_fallback({
+  "Cascadia Code",   -- 英数字・記号メイン
+  "Yu Gothic",       -- 日本語フォールバック
+})
 config.font_size = 13.0
 
 -- ==============================================
@@ -82,7 +85,7 @@ config.initial_rows = 35
 -- ==============================================
 -- 透明度設定
 -- ==============================================
-config.window_background_opacity = 0.5
+config.window_background_opacity = 0.8
 config.win32_system_backdrop = "Acrylic"
 
 local is_blur = true
