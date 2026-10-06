@@ -191,6 +191,17 @@ return {
     { key = 'U', mods = 'SHIFT|CTRL', action = act.CharSelect{ copy_on_select = true, copy_to = 'ClipboardAndPrimarySelection' } },
     { key = 'u', mods = 'SHIFT|CTRL', action = act.CharSelect{ copy_on_select = true, copy_to = 'ClipboardAndPrimarySelection' } },
     { key = 's', mods = 'ALT',        action = act.EmitEvent 'toggle-transparency' }, -- 透明度のトグル（カスタムイベント）
+
+    -- ===========================
+    -- シェル選択ランチャー（分割ペインで別シェルを開く）
+    -- ===========================
+    -- Ctrl+Alt+O の後に p/w/c で対象シェルを選択（小文字=左右分割、大文字=上下分割）
+    { key = 'o', mods = 'ALT|CTRL', action = act.ActivateKeyTable{
+        name = 'shell_launcher',
+        one_shot = true,
+        timeout_milliseconds = 3000,
+      }
+    },
   },
 
   key_tables = {
@@ -301,6 +312,28 @@ return {
       { key = 'PageDown',  mods = 'NONE', action = act.CopyMode 'NextMatchPage' },   -- 次のページのマッチへ
       { key = 'UpArrow',   mods = 'NONE', action = act.CopyMode 'PriorMatch' },
       { key = 'DownArrow', mods = 'NONE', action = act.CopyMode 'NextMatch' },
+    },
+
+    -- ===========================
+    -- シェル選択ランチャー（Ctrl+Alt+O で起動）
+    -- 小文字 = 左右分割 / 大文字(Shift) = 上下分割
+    -- ===========================
+    shell_launcher = {
+      -- PowerShell
+      { key = 'p', mods = 'NONE',  action = act.SplitHorizontal{ domain = { DomainName = 'local' }, args = { 'powershell.exe' } } },
+      { key = 'P', mods = 'SHIFT', action = act.SplitVertical{ domain = { DomainName = 'local' }, args = { 'powershell.exe' } } },
+
+      -- WSL (Ubuntu)
+      { key = 'w', mods = 'NONE',  action = act.SplitHorizontal{ domain = { DomainName = 'WSL:Ubuntu' } } },
+      { key = 'W', mods = 'SHIFT', action = act.SplitVertical{ domain = { DomainName = 'WSL:Ubuntu' } } },
+
+      -- コマンドプロンプト
+      { key = 'c', mods = 'NONE',  action = act.SplitHorizontal{ domain = { DomainName = 'local' }, args = { 'cmd.exe' } } },
+      { key = 'C', mods = 'SHIFT', action = act.SplitVertical{ domain = { DomainName = 'local' }, args = { 'cmd.exe' } } },
+
+      -- キャンセル
+      { key = 'Escape', mods = 'NONE', action = act.PopKeyTable },
+      { key = 'q',       mods = 'NONE', action = act.PopKeyTable },
     },
   }
 }
