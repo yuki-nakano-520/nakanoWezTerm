@@ -24,7 +24,8 @@ config.color_scheme = "Kanagawa (Gogh)"
 -- ==============================================
 -- タブバー設定
 -- ==============================================
-config.hide_tab_bar_if_only_one_tab = true
+-- タブバーにウィンドウ操作ボタンを置くため、タブが1つでも常に表示する
+config.hide_tab_bar_if_only_one_tab = false
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = false
 
@@ -60,6 +61,28 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
     { Text = SOLID_RIGHT_ARROW },
   }
 end)
+
+-- タブバー上のウィンドウ操作ボタンをWindows標準に近い細いアイコンにする
+local function window_button(glyph, fg, bg)
+  return wezterm.format({
+    { Background = { Color = bg } },
+    { Foreground = { Color = fg } },
+    { Text = "  " .. glyph .. "  " },
+  })
+end
+
+local BUTTON_MINIMIZE = wezterm.nerdfonts.cod_chrome_minimize
+local BUTTON_MAXIMIZE = wezterm.nerdfonts.cod_chrome_maximize
+local BUTTON_CLOSE = wezterm.nerdfonts.cod_chrome_close
+
+config.tab_bar_style = {
+  window_hide = window_button(BUTTON_MINIMIZE, "#dcd7ba", "#1f1f28"),
+  window_hide_hover = window_button(BUTTON_MINIMIZE, "#dcd7ba", "#2a2a37"),
+  window_maximize = window_button(BUTTON_MAXIMIZE, "#dcd7ba", "#1f1f28"),
+  window_maximize_hover = window_button(BUTTON_MAXIMIZE, "#dcd7ba", "#2a2a37"),
+  window_close = window_button(BUTTON_CLOSE, "#dcd7ba", "#1f1f28"),
+  window_close_hover = window_button(BUTTON_CLOSE, "#ffffff", "#e81123"),
+}
 
 config.colors = {
   -- Kanagawa のアクセントカラーでペイン境界をはっきり表示する
@@ -109,7 +132,8 @@ end)
 -- ==============================================
 -- タイトルバー設定
 -- ==============================================
-config.window_decorations = "RESIZE"
+-- タイトルバーは出さず、最小化・最大化・×ボタンをタブバーに配置する
+config.window_decorations = "INTEGRATED_BUTTONS | RESIZE"
 
 -- ==============================================
 -- カーソル設定
