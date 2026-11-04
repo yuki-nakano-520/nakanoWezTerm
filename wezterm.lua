@@ -24,7 +24,8 @@ config.color_scheme = "Kanagawa (Gogh)"
 -- ==============================================
 -- タブバー設定
 -- ==============================================
-config.hide_tab_bar_if_only_one_tab = true
+-- タブバーにウィンドウ操作ボタンを置くため、タブが1つでも常に表示する
+config.hide_tab_bar_if_only_one_tab = false
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = false
 
@@ -109,7 +110,8 @@ end)
 -- ==============================================
 -- タイトルバー設定
 -- ==============================================
-config.window_decorations = "RESIZE"
+-- タイトルバーは出さず、最小化・最大化・×ボタンをタブバーに配置する
+config.window_decorations = "INTEGRATED_BUTTONS | RESIZE"
 
 -- ==============================================
 -- カーソル設定
